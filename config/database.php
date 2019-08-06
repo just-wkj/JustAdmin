@@ -9,17 +9,20 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+
+use think\facade\Env;
+
 return [
     // 数据库类型
     'type'            => 'mysql',
     // 服务器地址
-    'hostname'        => '127.0.0.1',
+    'hostname'        => Env::get('DB_HOST'),
     // 数据库名
-    'database'        => '',
+    'database'        => Env::get('DB_NAME'),
     // 用户名
-    'username'        => 'root',
+    'username'        => Env::get('DB_USER'),
     // 密码
-    'password'        => '',
+    'password'        => Env::get('DB_PWD'),
     // 端口
     'hostport'        => '',
     // 连接dsn
