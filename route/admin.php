@@ -7,11 +7,17 @@
  */
 
 
+use think\facade\Route;
+
 $afterBehavior = [
     '\app\admin\behavior\ApiAuth',
     '\app\admin\behavior\ApiPermission',
     '\app\admin\behavior\AdminLog'
 ];
+Route::group('admin/', function(){
+    Route::rule('Login/index', 'admin/Login/index', 'POST', ['after_behavior' => ['\app\admin\behavior\ApiAuth', '\app\admin\behavior\AdminLog']]) ;
+    Route::rule('Login/logout', 'admin/Login/logout', 'GET', ['after_behavior' => ['\app\admin\behavior\ApiAuth', '\app\admin\behavior\AdminLog']]) ;
+});
 
 return [
     '[admin]' => [

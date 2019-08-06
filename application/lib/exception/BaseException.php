@@ -10,6 +10,7 @@ use think\Exception;
 class BaseException extends Exception {
     public $code = ErrorCode::ERROR;
     public $msg = '参数有误!';
+    public $data = [];
 
 
     public function __construct($params = []) {
@@ -22,6 +23,9 @@ class BaseException extends Exception {
         }
         if (array_key_exists('msg', $params)) {
             $this->msg = $params['msg'];
+        }
+        if (array_key_exists('data', $params)) {
+            $this->data = $params['data'];
         }
     }
 }

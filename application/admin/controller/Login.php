@@ -9,7 +9,7 @@ namespace app\admin\controller;
 
 
 use app\admin\validate\LoginValidate;
-use app\lib\enum\ReturnCode;
+use app\lib\exception\AdminLoginException;
 use app\lib\utils\Tools;
 use app\model\AdminAuthGroupAccess;
 use app\model\AdminAuthRule;
@@ -19,12 +19,14 @@ use app\model\AdminUserData;
 
 class Login extends Base {
 
+
     /**
-     * 用户登录
-     * @return array
-     * @throws \think\Exception
-     * @throws \think\exception\DbException
-     * @author zhaoxiang <zhaoxiang051405@gmail.com>
+     *  管理员登录处理
+     * @throws AdminLoginException
+     * @throws \app\lib\exception\ParameterException
+     * @throws \app\lib\response\Success
+     * @author: justwkj
+     * @date: 2019-08-06 18:13
      */
     public function index() {
         $validate = new LoginValidate();
@@ -36,50 +38,49 @@ class Login extends Base {
 
         $password = Tools::userMd5($password);
         $userInfo = AdminUser::get(['username' => $username, 'password' => $password]);
-        if (!empty($userInfo)) {
-            if ($userInfo['status']) {
-                //更新用户数据
-                $userData = AdminUserData::get(['uid' => $userInfo['id']]);
-                $data = [];
-                if ($userData) {
-                    $userData->loginTimes ++;
-                    $userData->lastLoginIp = $this->request->ip(1);
-                    $userData->lastLoginTime = time();
-                    $return['headImg'] = $userData['headImg'];
-                    $userData->save();
-                } else {
-                    $data['loginTimes'] = 1;
-                    $data['uid'] = $userInfo['id'];
-                    $data['lastLoginIp'] = $this->request->ip(1);
-                    $data['lastLoginTime'] = time();
-                    $data['headImg'] = '';
-                    $return['headImg'] = '';
-                    AdminUserData::create($data);
-                }
-            } else {
-                return $this->err( '用户已被封禁，请联系管理员');
-            }
-        } else {
+        if (empty($userInfo)) {
             return $this->err('用户名密码不正确');
         }
+
+        if (!($userInfo['status'])) {
+            return $this->err('用户已被封禁，请联系管理员');
+        }
+
+        //更新用户数据
+        $userData = AdminUserData::get(['uid' => $userInfo['id']]);
+        $data = [];
+        $return = [];
+        $return['headImg'] = $userData['headImg'];
+        if ($userData) {
+            $userData->loginTimes++;
+            $userData->lastLoginIp = $this->request->ip(1);
+            $userData->lastLoginTime = time();
+            $userData->save();
+        } else {
+            $data['loginTimes'] = 1;
+            $data['uid'] = $userInfo['id'];
+            $data['lastLoginIp'] = $this->request->ip(1);
+            $data['lastLoginTime'] = time();
+            AdminUserData::create($data);
+        }
         $apiAuth = md5(uniqid() . time());
-        cache('Login:' . $apiAuth, json_encode($userInfo), config('justAdmin.ONLINE_TIME'));
-        cache('Login:' . $userInfo['id'], $apiAuth, config('justAdmin.ONLINE_TIME'));
+        cache('Login:token:' . $apiAuth, json_encode($userInfo), config('justAdmin.ONLINE_TIME'));
+        cache('Login:uid:' . $userInfo['id'], $apiAuth, config('justAdmin.ONLINE_TIME'));
 
         $return['access'] = [];
+
         $isSupper = Tools::isAdministrator($userInfo['id']);
         if ($isSupper) {
             $access = AdminMenu::all(['hide' => 0]);
-            $access = Tools::buildArrFromObj($access);
-            $return['access'] = array_values(array_filter(array_column($access, 'url')));
         } else {
             $groups = AdminAuthGroupAccess::get(['uid' => $userInfo['id']]);
-            if (isset($groups) || $groups->groupId) {
-                $access = (new AdminAuthRule())->whereIn('groupId', $groups->groupId)->select();
-                $access = Tools::buildArrFromObj($access);
-                $return['access'] = array_values(array_unique(array_column($access, 'url')));
+            if (!isset($groups) || !$groups->groupId) {
+                throw new AdminLoginException();
             }
+            $access = (new AdminAuthRule())->whereIn('groupId', $groups->groupId)->select();
         }
+        $access = $access->toArray();
+        $return['access'] = array_values(array_filter(array_column($access, 'url')));
 
         $return['id'] = $userInfo['id'];
         $return['username'] = $userInfo['username'];
@@ -91,10 +92,10 @@ class Login extends Base {
 
     public function logout() {
         $ApiAuth = $this->request->header('ApiAuth');
-        cache('Login:' . $ApiAuth, null);
-        cache('Login:' . $this->userInfo['id'], null);
+        cache('Login:token:' . $ApiAuth, null);
+        cache('Login:uid:' . $this->userInfo['id'], null);
 
-        return $this->buildSuccess([], '登出成功');
+        return $this->ok([], '登出成功');
     }
 
 }

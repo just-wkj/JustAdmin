@@ -11,6 +11,8 @@ class ErrorCode {
     CONST DB_SAVE_ERROR = 1002;//数据库保存失败
     CONST PARAM_INVALID = 1003;//参数无效
 
+    CONST ADMIN_LOGIN_ERROR = 2000;//管理员登录失败
+
     CONST PERMISSION_DENY = 4000;//无权操作
     CONST SERVER_ERROR = 5000;//服务器错误
     CONST THIRD_ERROR = 5001;//第三方服务异常

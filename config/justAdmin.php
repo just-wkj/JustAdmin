@@ -11,7 +11,7 @@ return [
     'APP_VERSION' => 'v1',
     'APP_NAME'    => 'JustAdmin',
 
-    //鉴权相关
+    //超级管理员ID, 数组或者英文逗号拼接字符串
     'USER_ADMINISTRATOR' => [1],
 
     //安全秘钥

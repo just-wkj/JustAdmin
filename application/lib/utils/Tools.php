@@ -76,6 +76,21 @@ class Tools {
         return '' === $str ? '' : md5(sha1($str) . $auth_key);
     }
 
+    //是否是超级管理员
+    public static function isAdministrator($uid = '') {
+        if (empty($uid) || !is_numeric($uid)) {
+            return false;
+        }
+
+        $adminConf = config('justAdmin.USER_ADMINISTRATOR');
+        if (!is_array($adminConf)) {
+            $adminConf = explode(',', $adminConf);
+        }
+        if (!in_array($uid, $adminConf)) {
+            return false;
+        }
+        return true;
+    }
 
     public static function isNotEmptyString($str, $trim = true) {
         $str = $trim ? trim($str) : $str;

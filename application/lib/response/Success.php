@@ -15,5 +15,4 @@ use app\lib\exception\BaseException;
 class Success extends BaseException {
     public $code = ErrorCode::SUCCESS;
     public $msg = "操作成功";
-
 }
