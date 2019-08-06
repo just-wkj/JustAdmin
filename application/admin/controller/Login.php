@@ -8,13 +8,14 @@
 namespace app\admin\controller;
 
 
+use app\admin\validate\LoginValidate;
+use app\lib\enum\ReturnCode;
+use app\lib\utils\Tools;
 use app\model\AdminAuthGroupAccess;
 use app\model\AdminAuthRule;
 use app\model\AdminMenu;
 use app\model\AdminUser;
 use app\model\AdminUserData;
-use app\util\ReturnCode;
-use app\util\Tools;
 
 class Login extends Base {
 
@@ -26,16 +27,14 @@ class Login extends Base {
      * @author zhaoxiang <zhaoxiang051405@gmail.com>
      */
     public function index() {
-        $username = $this->request->post('username');
-        $password = $this->request->post('password');
-        if (!$username) {
-            return $this->buildFailed(ReturnCode::LOGIN_ERROR, '缺少用户名!');
-        }
-        if (!$password) {
-            return $this->buildFailed(ReturnCode::LOGIN_ERROR, '缺少密码!');
-        } else {
-            $password = Tools::userMd5($password);
-        }
+        $validate = new LoginValidate();
+        $validate->goCheck();
+        $data = $validate->getDataByRule();
+
+        $username = $data['username'];
+        $password = $data['password'];
+
+        $password = Tools::userMd5($password);
         $userInfo = AdminUser::get(['username' => $username, 'password' => $password]);
         if (!empty($userInfo)) {
             if ($userInfo['status']) {
@@ -58,10 +57,10 @@ class Login extends Base {
                     AdminUserData::create($data);
                 }
             } else {
-                return $this->buildFailed(ReturnCode::LOGIN_ERROR, '用户已被封禁，请联系管理员');
+                return $this->err( '用户已被封禁，请联系管理员');
             }
         } else {
-            return $this->buildFailed(ReturnCode::LOGIN_ERROR, '用户名密码不正确');
+            return $this->err('用户名密码不正确');
         }
         $apiAuth = md5(uniqid() . time());
         cache('Login:' . $apiAuth, json_encode($userInfo), config('justAdmin.ONLINE_TIME'));
@@ -87,7 +86,7 @@ class Login extends Base {
         $return['nickname'] = $userInfo['nickname'];
         $return['apiAuth'] = $apiAuth;
 
-        return $this->buildSuccess($return, '登录成功');
+        return $this->ok($return);
     }
 
     public function logout() {

@@ -30,7 +30,7 @@ class ExceptionHandler extends Handle {
 
 
         $result = [
-            'code'        => $this->code,
+            'errCode'        => $this->code,
             'msg'         => $this->msg,
             'data'        => [],
         ];

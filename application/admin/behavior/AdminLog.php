@@ -15,13 +15,6 @@ use think\Request;
 
 class AdminLog {
 
-    /**
-     * 后台操作日志记录
-     * @author zhaoxiang <zhaoxiang051405@gmail.com>
-     * @return \think\response\Json
-     * @throws \think\Exception
-     * @throws \think\exception\DbException
-     */
     public function run() {
         $header = config('justAdmin.CROSS_DOMAIN');
         $request = Request::instance();

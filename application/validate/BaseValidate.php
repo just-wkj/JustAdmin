@@ -5,7 +5,7 @@ namespace app\validate;
 
 
 use app\lib\exception\ParameterException;
-use think\Request;
+use think\facade\Request;
 use think\Validate;
 
 class BaseValidate extends Validate {
@@ -19,7 +19,6 @@ class BaseValidate extends Validate {
     public function goCheck() {
         $request = Request::instance();
         $params = $request->param();
-        //$params['token'] = $request->header('token');
 
         if (!$this->check($params)) {
             throw new ParameterException([
@@ -34,9 +33,20 @@ class BaseValidate extends Validate {
      * @return array 按照规则key过滤后的变量数组
      * @throws ParameterException
      */
-    public function getDataByRule($arrays) {
+    public function getDataByRule($arrays=null) {
+        if(null === $arrays){
+            $arrays = Request::instance()->param();
+        }
         $newArray = [];
         foreach ($this->rule as $key => $value) {
+            $keyArr = explode('|', $key);
+            $key = reset($keyArr);
+
+            $valueArr = explode('|', $value);
+            if(in_array('forbidden', $valueArr)){
+                continue;
+            }
+
             $newArray[$key] = $arrays[$key];
         }
         return $newArray;
@@ -63,7 +73,8 @@ class BaseValidate extends Validate {
         $value = strval($value);
         $value = trim($value);
         if (0 === strlen($value)) {
-            return $field . '不允许为空';
+            //return $field . '不允许为空';
+            return false;
         }
         return true;
     }
@@ -71,7 +82,8 @@ class BaseValidate extends Validate {
 
     protected function isNotEmpty($value, $rule = '', $data = '', $field = '') {
         if (empty($value)) {
-            return $field . '不允许为空';
+            //return $field . '不允许为空';
+            return false;
         }
         return true;
     }

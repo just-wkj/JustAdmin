@@ -5,10 +5,10 @@ namespace app\lib\exception;
 
 
 
-use app\lib\enum\ReturnCode;
+use app\lib\enum\ErrorCode;
 
 class ParameterException extends BaseException {
 
-    public $code = ReturnCode::PARAM_INVALID;
+    public $code = ErrorCode::PARAM_INVALID;
     public $msg = "参数异常!";
 }
