@@ -7,6 +7,7 @@ namespace app\lib\exception;
 use app\lib\enum\ErrorCode;
 use Exception;
 use think\exception\Handle;
+use think\facade\Config;
 
 class ExceptionHandler extends Handle {
     private $code;
@@ -36,7 +37,7 @@ class ExceptionHandler extends Handle {
             'msg'     => $this->msg,
             'data'    => $this->data,
         ];
-        return json($result);
+        return json($result,200,  Config::get('justAdmin.CROSS_DOMAIN'));
     }
 
     /*

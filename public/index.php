@@ -9,8 +9,18 @@
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
 
+
 // [ 应用入口文件 ]
 namespace think;
+
+
+//options 处理
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    header("Access-Control-Allow-Origin: * ");
+    header("Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE");
+    header("Access-Control-Allow-Headers: justToken, auth, Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    exit;
+}
 
 // 加载基础文件
 require __DIR__ . '/../thinkphp/base.php';
