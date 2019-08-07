@@ -76,7 +76,7 @@ class User extends Base {
             }
         }
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listInfo,
             'count' => $listObj['total']
         ]);
@@ -99,14 +99,14 @@ class User extends Base {
         unset($postData['groupId']);
         $res = AdminUser::create($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
             AdminAuthGroupAccess::create([
                 'uid'     => $res->id,
                 'groupId' => $groups
             ]);
 
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -123,7 +123,7 @@ class User extends Base {
         $start = $this->request->get('page', 1);
         $gid = $this->request->get('gid', 0);
         if (!$gid) {
-            return $this->buildFailed(ReturnCode::PARAM_INVALID, '非法操作');
+            return $this->json(ReturnCode::PARAM_INVALID, '非法操作');
         }
 
         $listInfo = (new AdminAuthGroupAccess())->where(['groupId' => ['like', "%{$gid}%"]])->select();
@@ -149,7 +149,7 @@ class User extends Base {
             $userInfo[$key]['regIp'] = long2ip($userInfo[$key]['regIp']);
         }
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $userInfo,
             'count' => $listObj['total']
         ]);
@@ -169,9 +169,9 @@ class User extends Base {
             'updateTime' => time()
         ]);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -196,7 +196,7 @@ class User extends Base {
         unset($postData['groupId']);
         $res = AdminUser::update($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
             $has = AdminAuthGroupAccess::get(['uid' => $postData['id']]);
             if ($has) {
@@ -212,7 +212,7 @@ class User extends Base {
                 ]);
             }
 
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -231,7 +231,7 @@ class User extends Base {
             if ($oldPass === $this->userInfo['password']) {
                 $postData['password'] = Tools::userMd5($postData['password']);
             } else {
-                return $this->buildFailed(ReturnCode::INVALID, '原始密码不正确');
+                return $this->json(ReturnCode::INVALID, '原始密码不正确');
             }
         } else {
             unset($postData['password']);
@@ -242,13 +242,13 @@ class User extends Base {
         unset($postData['headImg']);
         $res = AdminUser::update($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
             $userData = AdminUserData::get(['uid' => $postData['id']]);
             $userData->headImg = $headImg;
             $userData->save();
 
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -260,12 +260,12 @@ class User extends Base {
     public function del() {
         $id = $this->request->get('id');
         if (!$id) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         AdminUser::destroy($id);
         AdminAuthGroupAccess::destroy(['uid' => $id]);
 
-        return $this->buildSuccess([]);
+        return $this->ok([]);
 
     }
 

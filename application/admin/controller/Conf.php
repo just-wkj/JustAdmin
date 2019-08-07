@@ -9,6 +9,6 @@ use think\Config;
 class Conf extends Base {
 
     public function index() {
-        return $this->buildSuccess(Config::get('static'));
+        return $this->ok(Config::get('static'));
     }
 }

@@ -39,7 +39,7 @@ class File extends Base {
         $listObj = $this->model->getList($where, $limit)->toArray();
         $listInfo = $listObj['data'];
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listInfo,
             'count' => $listObj['total']
         ]);
@@ -54,13 +54,13 @@ class File extends Base {
         $postData = $this->request->post();
         $res = $this->model->updateData($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
             if (isset($postData['f_recommend']) && $postData['f_recommend']) {
                 $this->model->updateData(['f_recommend' => PrevFile::RECOMMEND_HIDEN], ['f_id' => ['NOT IN', $postData['f_id']]]);
             }
 
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -73,9 +73,9 @@ class File extends Base {
         $postData = $this->request->post();
         $res = $this->model->addData($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -88,9 +88,9 @@ class File extends Base {
         $id = $this->request->get('id');
         $res = $this->model->deleteData($id);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 }

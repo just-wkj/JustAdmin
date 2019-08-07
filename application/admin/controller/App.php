@@ -47,7 +47,7 @@ class App extends Base {
         $listObj = (new AdminApp())->where($where)->order('app_addTime DESC')
             ->paginate($limit, false, ['page' => $start])->toArray();
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listObj['data'],
             'count' => $listObj['total']
         ]);
@@ -77,7 +77,7 @@ class App extends Base {
             $res['app_secret'] = Strs::randString(32);
         }
 
-        return $this->buildSuccess($res);
+        return $this->ok($res);
     }
 
     /**
@@ -107,9 +107,9 @@ class App extends Base {
         }
         $res = AdminApp::create($data);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -127,9 +127,9 @@ class App extends Base {
             'id' => $id
         ]);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -157,9 +157,9 @@ class App extends Base {
         }
         $res = AdminApp::update($data, ['id' => $postData['id']]);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -171,10 +171,10 @@ class App extends Base {
     public function del() {
         $id = $this->request->get('id');
         if (!$id) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         AdminApp::destroy($id);
 
-        return $this->buildSuccess([]);
+        return $this->ok([]);
     }
 }

@@ -44,7 +44,7 @@ class InterfaceGroup extends Base {
         }
         $listObj = (new AdminGroup())->where($where)->paginate($limit, false, ['page' => $start])->toArray();
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listObj['data'],
             'count' => $listObj['total']
         ]);
@@ -60,7 +60,7 @@ class InterfaceGroup extends Base {
     public function getAll() {
         $listInfo = (new AdminGroup())->where(['status' => 1])->select();
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list' => $listInfo
         ]);
     }
@@ -79,9 +79,9 @@ class InterfaceGroup extends Base {
             'id' => $id
         ]);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -95,9 +95,9 @@ class InterfaceGroup extends Base {
         $postData['addTime'] = $postData['updateTime'] = time();
         $res = AdminGroup::create($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -111,9 +111,9 @@ class InterfaceGroup extends Base {
         $postData['updateTime'] = time();
         $res = AdminGroup::update($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -126,10 +126,10 @@ class InterfaceGroup extends Base {
     public function del() {
         $hash = $this->request->get('hash');
         if (!$hash) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         if ($hash === 'default') {
-            return $this->buildFailed(ReturnCode::INVALID, '系统预留关键数据，禁止删除！');
+            return $this->json(ReturnCode::INVALID, '系统预留关键数据，禁止删除！');
         }
 
         AdminList::update(['groupHash' => 'default'], ['groupHash' => $hash]);
@@ -155,6 +155,6 @@ class InterfaceGroup extends Base {
 
         AdminGroup::destroy(['hash' => $hash]);
 
-        return $this->buildSuccess([]);
+        return $this->ok([]);
     }
 }

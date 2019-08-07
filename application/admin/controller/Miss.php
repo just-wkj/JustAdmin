@@ -7,9 +7,9 @@ use think\Request;
 class Miss extends Base {
     public function index() {
         if (Request::instance()->isOptions()) {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         } else {
-            return $this->buildFailed(ReturnCode::INVALID, '接口地址异常', []);
+            return $this->json(ReturnCode::INVALID, '接口地址异常', []);
         }
     }
 }

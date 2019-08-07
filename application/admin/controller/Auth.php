@@ -37,7 +37,7 @@ class Auth extends Base {
         $listObj = (new AdminAuthGroup())->where($where)->order('id DESC')
             ->paginate($limit, false, ['page' => $start])->toArray();
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listObj['data'],
             'count' => $listObj['total']
         ]);
@@ -56,7 +56,7 @@ class Auth extends Base {
         $count = count($listInfo);
         $listInfo = Tools::buildArrFromObj($listInfo);
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listInfo,
             'count' => $count
         ]);
@@ -84,7 +84,7 @@ class Auth extends Base {
         }
         $newList = $this->buildList($list, $rules);
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list' => $newList
         ]);
     }
@@ -105,7 +105,7 @@ class Auth extends Base {
         unset($postData['rules']);
         $res = AdminAuthGroup::create($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
             if ($rules) {
                 $insertData = [];
@@ -120,7 +120,7 @@ class Auth extends Base {
                 (new AdminAuthRule())->saveAll($insertData);
             }
 
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -137,9 +137,9 @@ class Auth extends Base {
             'status' => $status
         ]);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -160,9 +160,9 @@ class Auth extends Base {
         unset($postData['rules']);
         $res = AdminAuthGroup::update($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -177,7 +177,7 @@ class Auth extends Base {
     public function del() {
         $id = $this->request->get('id');
         if (!$id) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
 
         $listInfo = (new AdminAuthGroupAccess())->where(['groupId' => ['like', "%{$id}%"]])->select();
@@ -196,7 +196,7 @@ class Auth extends Base {
         AdminAuthGroup::destroy($id);
         AdminAuthRule::destroy(['groupId' => $id]);
 
-        return $this->buildSuccess([]);
+        return $this->ok([]);
     }
 
     /**
@@ -210,7 +210,7 @@ class Auth extends Base {
         $gid = $this->request->get('gid', 0);
         $uid = $this->request->get('uid', 0);
         if (!$gid || !$uid) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         $oldInfo = AdminAuthGroupAccess::get(['uid' => $uid])->toArray();
         $oldGroupArr = explode(',', $oldInfo['groupId']);
@@ -223,9 +223,9 @@ class Auth extends Base {
             'uid' => $uid
         ]);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 

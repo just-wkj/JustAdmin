@@ -43,7 +43,7 @@ class News extends Base {
         $listObj = $this->prevNews->getList($where, $limit)->toArray();
         $listInfo = $listObj['data'];
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listInfo,
             'count' => $listObj['total']
         ]);
@@ -62,14 +62,14 @@ class News extends Base {
         ])->find();
 
         if(!$info){
-            return $this->buildFailed(ReturnCode::NOT_EXISTS, '操作失败,数据不存在');
+            return $this->json(ReturnCode::NOT_EXISTS, '操作失败,数据不存在');
         }
 
         $res = $this->prevNews->updateData($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -83,9 +83,9 @@ class News extends Base {
         if (isset($postData['n_desc'])) $postData['n_desc'] = str_replace('<img',   '<img style="width:100%; height:auto" ' , $postData['n_desc']);
         $res = $this->prevNews->addData($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -100,13 +100,13 @@ class News extends Base {
             'n_id' => $id
         ])->find();
         if(!$info){
-            return $this->buildFailed(ReturnCode::NOT_EXISTS, '操作失败,数据不存在');
+            return $this->json(ReturnCode::NOT_EXISTS, '操作失败,数据不存在');
         }
         $res = $this->prevNews->deleteData($id);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 }

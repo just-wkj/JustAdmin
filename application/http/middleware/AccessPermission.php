@@ -12,19 +12,23 @@ use think\Request;
 
 class AccessPermission {
 
+    private $justToken;
+    private $route;
+
     public function handle($request, \Closure $next) {
-        $routeInfo = $request->routeInfo();
-        $routeOptions = $routeInfo['option'];
+        $this->route = $request->routeInfo();
+        $routeOptions = $this->route['option'];
 
         //无需校验token
         if(array_key_exists('checkAccessPermission',$routeOptions) &&  empty($routeOptions['checkAccessPermission'])){
             return $next($request);
         }
 
+        $this->justToken = $request->header('justToken');
         //查看token是否有效
-        $userInfo = TokenService::getUserInfo($request->header('token'));
+        $userInfo = TokenService::getUserInfo($this->justToken);
 
-        if (!$this->checkAuth($userInfo['id'], $routeInfo['route'])) {
+        if (!$this->checkAuth($userInfo['id'], $this->route['route'])) {
             $data = ['code' => ErrorCode::ERROR, 'msg' => '非常抱歉，您没有权限这么做！', 'data' => []];
 
             return json($data, 200, $header);
@@ -35,27 +39,8 @@ class AccessPermission {
     }
 
 
-    /**
-     * 用户权限检测
-     * @return \think\response\Json
-     * @throws \think\db\exception\DataNotFoundException
-     * @throws \think\db\exception\ModelNotFoundException
-     * @throws \think\exception\DbException
-     * @author zhaoxiang <zhaoxiang051405@gmail.com>
-     */
-    public function run() {
-        $request = Request::instance();
-        $route = $request->routeInfo();
-        $header = config('justAdmin.CROSS_DOMAIN');
-        $ApiAuth = $request->header('ApiAuth', '');
-        $userInfo = cache('Login:' . $ApiAuth);
-        $userInfo = json_decode($userInfo, true);
-        if (!$this->checkAuth($userInfo['id'], $route['route'])) {
-            $data = ['code' => ReturnCode::INVALID, 'msg' => '非常抱歉，您没有权限这么做！', 'data' => []];
 
-            return json($data, 200, $header);
-        }
-    }
+
 
     /**
      * 检测用户权限

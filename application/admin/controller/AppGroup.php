@@ -43,7 +43,7 @@ class AppGroup extends Base {
         }
         $listObj = (new AdminAppGroup())->where($where)->paginate($limit, false, ['page' => $start])->toArray();
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listObj['data'],
             'count' => $listObj['total']
         ]);
@@ -59,7 +59,7 @@ class AppGroup extends Base {
     public function getAll() {
         $listInfo = (new AdminAppGroup())->where(['status' => 1])->select();
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list' => $listInfo
         ]);
     }
@@ -78,9 +78,9 @@ class AppGroup extends Base {
             'id' => $id
         ]);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -93,9 +93,9 @@ class AppGroup extends Base {
         $postData = $this->request->post();
         $res = AdminAppGroup::create($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -108,9 +108,9 @@ class AppGroup extends Base {
         $postData = $this->request->post();
         $res = AdminAppGroup::update($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -122,16 +122,16 @@ class AppGroup extends Base {
     public function del() {
         $hash = $this->request->get('hash');
         if (!$hash) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
 
         $has = (new AdminApp())->where(['app_group' => $hash])->count();
         if ($has) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '当前分组存在' . $has . '个应用，禁止删除');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '当前分组存在' . $has . '个应用，禁止删除');
         }
 
         AdminAppGroup::destroy(['hash' => $hash]);
 
-        return $this->buildSuccess([]);
+        return $this->ok([]);
     }
 }

@@ -25,7 +25,7 @@ class Menu extends Base {
         $list = Tools::buildArrFromObj($list);
         $list = formatTree(listToTree($list));
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list' => $list
         ], '登录成功');
     }
@@ -42,9 +42,9 @@ class Menu extends Base {
         }
         $res = AdminMenu::create($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -61,9 +61,9 @@ class Menu extends Base {
             'hide' => $status
         ]);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -79,9 +79,9 @@ class Menu extends Base {
         }
         $res = AdminMenu::update($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -93,15 +93,15 @@ class Menu extends Base {
     public function del() {
         $id = $this->request->get('id');
         if (!$id) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         $childNum = AdminMenu::where(['fid' => $id])->count();
         if ($childNum) {
-            return $this->buildFailed(ReturnCode::INVALID, '当前菜单存在子菜单,不可以被删除!');
+            return $this->json(ReturnCode::INVALID, '当前菜单存在子菜单,不可以被删除!');
         } else {
             AdminMenu::destroy($id);
 
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 

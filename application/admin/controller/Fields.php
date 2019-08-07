@@ -28,7 +28,7 @@ class Fields extends Base {
     );
 
     public function index() {
-        return $this->buildSuccess($this->dataType);
+        return $this->ok($this->dataType);
     }
 
     /**
@@ -46,13 +46,13 @@ class Fields extends Base {
             $listObj = (new AdminFields())->where(['hash' => $hash, 'type' => 0])
                 ->paginate($limit, false, ['page' => $start])->toArray();
 
-            return $this->buildSuccess([
+            return $this->ok([
                 'list'  => $listObj['data'],
                 'count' => $listObj['total'],
                 'dataType' => $this->dataType
             ]);
         } else {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
     }
 
@@ -71,13 +71,13 @@ class Fields extends Base {
             $listObj = (new AdminFields())->where(['hash' => $hash, 'type' => 1])
                 ->paginate($limit, false, ['page' => $start])->toArray();
 
-            return $this->buildSuccess([
+            return $this->ok([
                 'list'  => $listObj['data'],
                 'count' => $listObj['total'],
                 'dataType' => $this->dataType
             ]);
         } else {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
     }
 
@@ -98,9 +98,9 @@ class Fields extends Base {
         cache('ResponseFieldsRule:' . $postData['hash'], null);
 
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess('操作成功');
+            return $this->ok('操作成功');
         }
     }
 
@@ -121,9 +121,9 @@ class Fields extends Base {
         cache('ResponseFieldsRule:' . $postData['hash'], null);
 
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -136,7 +136,7 @@ class Fields extends Base {
     public function del() {
         $id = $this->request->get('id');
         if (!$id) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
 
         $fieldsInfo = AdminFields::get($id);
@@ -146,7 +146,7 @@ class Fields extends Base {
 
         AdminFields::destroy($id);
 
-        return $this->buildSuccess([]);
+        return $this->ok([]);
     }
 
     /**
@@ -164,7 +164,7 @@ class Fields extends Base {
         $jsonStr = html_entity_decode($jsonStr);
         $data = json_decode($jsonStr, true);
         if ($data === null) {
-            return $this->buildFailed(ReturnCode::EXCEPTION, 'JSON数据格式有误');
+            return $this->json(ReturnCode::EXCEPTION, 'JSON数据格式有误');
         }
         AdminList::update(['returnStr' => json_encode($data)], ['hash' => $hash]);
         $this->handle($data['data'], $dataArr);
@@ -194,7 +194,7 @@ class Fields extends Base {
         cache('RequestFields:Rule:' . $hash, null);
         cache('ResponseFieldsRule:' . $hash, null);
 
-        return $this->buildSuccess([]);
+        return $this->ok([]);
     }
 
     private function handle($data, &$dataArr, $prefix = 'data', $index = 'data') {

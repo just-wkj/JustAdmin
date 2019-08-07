@@ -49,7 +49,7 @@ class InterfaceList extends Base {
         $listObj = (new AdminList())->where($where)->order('id', 'DESC')
             ->paginate($limit, false, ['page' => $start])->toArray();
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listObj['data'],
             'count' => $listObj['total']
         ]);
@@ -63,7 +63,7 @@ class InterfaceList extends Base {
     public function getHash() {
         $res['hash'] = uniqid();
 
-        return $this->buildSuccess($res);
+        return $this->ok($res);
     }
 
     /**
@@ -75,9 +75,9 @@ class InterfaceList extends Base {
         $postData = $this->request->post();
         $res = AdminList::create($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -95,10 +95,10 @@ class InterfaceList extends Base {
             'hash' => $hash
         ]);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
             cache('ApiInfo:' . $hash, null);
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -111,10 +111,10 @@ class InterfaceList extends Base {
         $postData = $this->request->post();
         $res = AdminList::update($postData);
         if ($res === false) {
-            return $this->buildFailed(ReturnCode::DB_SAVE_ERROR, '操作失败');
+            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
         } else {
             cache('ApiInfo:' . $postData['hash'], null);
-            return $this->buildSuccess([]);
+            return $this->ok([]);
         }
     }
 
@@ -127,7 +127,7 @@ class InterfaceList extends Base {
     public function del() {
         $hash = $this->request->get('hash');
         if (!$hash) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
 
         $hashRule = AdminApp::all([
@@ -157,7 +157,7 @@ class InterfaceList extends Base {
 
         cache('ApiInfo:' . $hash, null);
 
-        return $this->buildSuccess([]);
+        return $this->ok([]);
     }
 
     /**
@@ -178,6 +178,6 @@ class InterfaceList extends Base {
         }
 
         file_put_contents($apiRoutePath, $tplStr);
-        return $this->buildSuccess([]);
+        return $this->ok([]);
     }
 }

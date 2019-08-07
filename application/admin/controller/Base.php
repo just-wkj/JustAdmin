@@ -7,6 +7,7 @@
 
 namespace app\admin\controller;
 
+use app\admin\service\TokenService;
 use app\lib\enum\ErrorCode;
 use app\lib\utils\Tools;
 use think\Controller;
@@ -15,15 +16,13 @@ class Base extends Controller {
 
     protected $userInfo;
     protected $admin_id;
-    protected $shop_id;
 
-    public function _initialize() {
-        $ApiAuth = $this->request->header('ApiAuth');
-        if ($ApiAuth) {
-            $userInfo = cache('Login:' . $ApiAuth);
-            $this->userInfo = json_decode($userInfo, true);
+    public function initialize() {
+        $justToken = $this->request->header('justToken');
+        if ($justToken) {
+            $userInfo = TokenService::getUserInfo($justToken);
+            $this->userInfo =$userInfo;
             $this->admin_id = $this->userInfo['id'];
-            $this->shop_id = $this->userInfo['shop_id'];
         }
     }
 

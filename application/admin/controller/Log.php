@@ -47,7 +47,7 @@ class Log extends Base {
         $listObj = (new AdminUserAction())->where($where)->order('addTime DESC')
             ->paginate($limit, false, ['page' => $start])->toArray();
 
-        return $this->buildSuccess([
+        return $this->ok([
             'list'  => $listObj['data'],
             'count' => $listObj['total']
         ]);
@@ -61,11 +61,11 @@ class Log extends Base {
     public function del() {
         $id = $this->request->get('id');
         if (!$id) {
-            return $this->buildFailed(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
+            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
         }
         AdminUserAction::destroy($id);
 
-        return $this->buildSuccess([]);
+        return $this->ok([]);
 
     }
 
