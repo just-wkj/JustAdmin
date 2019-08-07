@@ -8,6 +8,8 @@
 namespace app\admin\controller;
 
 
+use app\admin\service\CacheService;
+use app\admin\service\TokenService;
 use app\admin\validate\LoginValidate;
 use app\lib\exception\AdminLoginException;
 use app\lib\utils\Tools;
@@ -64,8 +66,7 @@ class Login extends Base {
             AdminUserData::create($data);
         }
         $apiAuth = md5(uniqid() . time());
-        cache('Login:token:' . $apiAuth, json_encode($userInfo), config('justAdmin.ONLINE_TIME'));
-        cache('Login:uid:' . $userInfo['id'], $apiAuth, config('justAdmin.ONLINE_TIME'));
+        TokenService::setLoginToken($apiAuth, $userInfo);
 
         $return['access'] = [];
 
@@ -91,11 +92,8 @@ class Login extends Base {
     }
 
     public function logout() {
-        $ApiAuth = $this->request->header('ApiAuth');
-        cache('Login:token:' . $ApiAuth, null);
-        cache('Login:uid:' . $this->userInfo['id'], null);
-
-        return $this->ok([], '登出成功');
+        TokenService::clearLoginToken($this->request->header('token'));
+        return $this->ok();
     }
 
 }

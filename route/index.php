@@ -11,6 +11,8 @@
 
 use think\facade\Route;
 
-Route::group('admin/', function(){
-   Route::rule('Login/index', 'admin/Login/index', 'POST', ['after_behavior' => ['\app\admin\behavior\ApiAuth', '\app\admin\behavior\AdminLog']]) ;
-});
+//Route::group('admin/', function(){
+//   Route::rule('Login/index', 'admin/Login/index', 'POST', ['after_behavior' => ['\app\admin\behavior\ApiAuth', '\app\admin\behavior\AdminLog']]) ;
+//});
+
+Route::get('Index/indexxx', 'index/Index/index');

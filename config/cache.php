@@ -13,13 +13,19 @@
 // | 缓存设置
 // +----------------------------------------------------------------------
 
+use think\facade\Env;
+
 return [
     // 驱动方式
-    'type'   => 'File',
+    'type'     => Env::get('CACHE_TYPE'),
+    'host'     => Env::get('CACHE_HOST'),
+    'port'     => Env::get('CACHE_PORT'),
+    'password' => Env::get('CACHE_AUTH'),
+    'select'   => Env::get('CACHE_DB'),
+    'prefix'   => 'justadmin:',
+
     // 缓存保存目录
-    'path'   => '',
-    // 缓存前缀
-    'prefix' => '',
+    'path'     => '',
     // 缓存有效期 0表示永久缓存
-    'expire' => 0,
+    'expire'   => 0,
 ];
