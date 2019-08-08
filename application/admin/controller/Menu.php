@@ -8,26 +8,28 @@
 namespace app\admin\controller;
 
 
+use app\lib\utils\Tools;
 use app\model\AdminMenu;
-use app\util\ReturnCode;
-use app\util\Tools;
 
 class Menu extends Base {
 
+
     /**
-     * 获取菜单列表
-     * @return array
+     * 菜单列表
+     * @throws \app\lib\response\Success
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
      * @throws \think\exception\DbException
-     * @author zhaoxiang <zhaoxiang051405@gmail.com>
+     * @author: justwkj
+     * @date: 2019-08-08 11:06
      */
     public function index() {
-        $list = (new AdminMenu)->where([])->order('sort', 'ASC')->select();
-        $list = Tools::buildArrFromObj($list);
-        $list = formatTree(listToTree($list));
+        $list = (new AdminMenu)->order('sort', 'ASC')->select();
+        $list = formatTree(listToTree($list->toArray()));
 
         return $this->ok([
-            'list' => $list
-        ], '登录成功');
+            'data' => $list
+        ]);
     }
 
     /**
