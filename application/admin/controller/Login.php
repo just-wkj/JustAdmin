@@ -41,11 +41,11 @@ class Login extends Base {
         $password = Tools::userMd5($password);
         $userInfo = AdminUser::get(['username' => $username, 'password' => $password]);
         if (empty($userInfo)) {
-            return $this->json('用户名密码不正确');
+            return $this->err('用户名密码不正确');
         }
 
         if (!($userInfo['status'])) {
-            return $this->json('用户已被封禁，请联系管理员');
+            return $this->err('用户已被封禁，请联系管理员');
         }
 
         //更新用户数据
@@ -99,7 +99,7 @@ class Login extends Base {
      * @date: 2019-08-07 17:27
      */
     public function logout() {
-        TokenService::clearLoginToken($this->request->header('token'));
+        TokenService::clearLoginToken();
         return $this->ok();
     }
 

@@ -11,6 +11,7 @@ namespace app\admin\service;
 
 use app\lib\exception\AccessTokenException;
 use app\lib\exception\AuthTokenException;
+use think\facade\Request;
 
 class TokenService {
 
@@ -21,7 +22,9 @@ class TokenService {
         //cache('User:group:'.$userInfo[''])
     }
 
-    public static function clearLoginToken($token){
+    public static function clearLoginToken(){
+        $request = Request::instance();
+        $token = $request->header('justToken');
         $userInfo = self::getUserInfo($token);
         cache('User:token:'.$token, null);
         cache('User:uid:'.$userInfo['id'], null);
@@ -29,7 +32,7 @@ class TokenService {
 
     public static function getUserInfo($token){
         if(strlen($token) != 32){
-            throw new AccessTokenException();
+            throw new AuthTokenException();
         }
         $userInfo = cache('User:token:'.$token);
         if(!$userInfo){
