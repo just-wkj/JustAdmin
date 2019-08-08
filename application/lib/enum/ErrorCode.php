@@ -8,8 +8,14 @@ class ErrorCode {
     const SUCCESS = 0;//通用成功
     const ERROR = 1000;//通用错误
     CONST DATA_NOT_EXISTS = 1001;//数据不存在
-    CONST DB_SAVE_ERROR = 1002;//数据库保存失败
     CONST PARAM_INVALID = 1003;//参数无效
+    CONST DELETE_ERROR = 1005;//删除失败
+
+
+    CONST DB_INSERT_ERROR = 1010;//数据库新增失败
+    CONST DB_UPDATE_ERROR = 1011;//数据更新失败
+    CONST DB_DELETE_ERROR = 1012;//数据删除失败
+    CONST DB_SAVE_ERROR = 10213;//数据保存失败
 
 
 

@@ -1,15 +1,11 @@
 <?php
-/**
- * 目录管理
- * @since   2018-01-16
- * @author  zhaoxiang <zhaoxiang051405@gmail.com>
- */
 
 namespace app\admin\controller;
 
 
-use app\lib\utils\Tools;
+use app\lib\exception\MenuDenyDeleteException;
 use app\model\AdminMenu;
+use app\validate\IdMustBeIntegerValidate;
 
 class Menu extends Base {
 
@@ -28,14 +24,16 @@ class Menu extends Base {
         $list = formatTree(listToTree($list->toArray()));
 
         return $this->ok([
-            'data' => $list
+            'data' => $list,
         ]);
     }
 
+
     /**
      * 新增菜单
-     * @return array
-     * @author zhaoxiang <zhaoxiang051405@gmail.com>
+     * @throws \app\lib\response\Success
+     * @author: justwkj
+     * @date: 2019-08-08 14:22
      */
     public function add() {
         $postData = $this->request->post();
@@ -44,35 +42,37 @@ class Menu extends Base {
         }
         $res = AdminMenu::create($postData);
         if ($res === false) {
-            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
-        } else {
-            return $this->ok([]);
+            $this->err();
         }
+        return $this->ok();
     }
 
+
     /**
-     * 菜单状态编辑
-     * @return array
-     * @author zhaoxiang <zhaoxiang051405@gmail.com>
+     * 修改状态
+     * @throws \app\lib\response\Success
+     * @author: justwkj
+     * @date: 2019-08-08 14:21
      */
     public function changeStatus() {
         $id = $this->request->get('id');
         $status = $this->request->get('status');
         $res = AdminMenu::update([
             'id'   => $id,
-            'hide' => $status
+            'hide' => $status,
         ]);
         if ($res === false) {
-            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
-        } else {
-            return $this->ok([]);
+            $this->err();
         }
+        return $this->ok();
     }
 
+
     /**
-     * 编辑菜单
-     * @return array
-     * @author zhaoxiang <zhaoxiang051405@gmail.com>
+     * 菜单编辑
+     * @throws \app\lib\response\Success
+     * @author: justwkj
+     * @date: 2019-08-08 14:21
      */
     public function edit() {
         $postData = $this->request->post();
@@ -81,30 +81,32 @@ class Menu extends Base {
         }
         $res = AdminMenu::update($postData);
         if ($res === false) {
-            return $this->json(ReturnCode::DB_SAVE_ERROR, '操作失败');
-        } else {
-            return $this->ok([]);
+            $this->err();
         }
+        return $this->ok();
     }
 
+
     /**
-     * 删除菜单
-     * @return array
-     * @author zhaoxiang <zhaoxiang051405@gmail.com>
+     * 菜单删除
+     * @throws MenuDenyDeleteException
+     * @throws \app\lib\exception\ParameterException
+     * @throws \app\lib\response\Success
+     * @author: justwkj
+     * @date: 2019-08-08 14:21
      */
     public function del() {
-        $id = $this->request->get('id');
-        if (!$id) {
-            return $this->json(ReturnCode::EMPTY_PARAMS, '缺少必要参数');
-        }
+        $validate = new IdMustBeIntegerValidate();
+        $validate->goCheck();
+        $data = $validate->getDataByRule();
+        $id = $data['id'];
+
         $childNum = AdminMenu::where(['fid' => $id])->count();
         if ($childNum) {
-            return $this->json(ReturnCode::INVALID, '当前菜单存在子菜单,不可以被删除!');
-        } else {
-            AdminMenu::destroy($id);
-
-            return $this->ok([]);
+            throw new MenuDenyDeleteException();
         }
+        AdminMenu::destroy($id);
+        return $this->ok([]);
     }
 
 }
